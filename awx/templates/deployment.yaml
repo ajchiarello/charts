@@ -100,17 +100,19 @@ spec:
 {{ toYaml .Values.nodeSelector | indent 8 }}
     {{- end }}
       volumes:
-      - name: {{ include "awx.fullname" . }}-application-config
-          configMap:
-            name: {{ include "awx.fullname" . }}
-            items:
-            - key: settings.py
-              path: settings.py
-            - key: secret_key
-              path: SECRET_KEY
-      - name: {{ include "awx.fullname" . }}-nginx-config
-          configMap:
-            name: {{ include "awx.fullname" . }}
-            items:
-            - key: nginx.conf
-              path: nginx.conf
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: settings.py
+            path: settings.py
+          - key: secret_key
+            path: SECRET_KEY
+          name: {{ include "awx.fullname" . }}
+        name: {{ include "awx.fullname" . }}-application-config
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+          name: {{ include "awx.fullname" . }}
+        name: {{ include "awx.fullname" . }}-nginx-config
