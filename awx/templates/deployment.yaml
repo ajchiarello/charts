@@ -71,8 +71,14 @@ spec:
           command:
             - /usr/bin/launch_awx_task.sh
           volumeMounts:
-            - mountPath: /etc/tower
-              name: {{ include "awx.fullname" . }}
+            - mountPath: /etc/tower/settings.py
+              name: {{ include "awx.fullname" . }}-application-config
+              subPath: settings.py
+              readOnly: true
+            - mountPath: /etc/tower/SECRET_KEY
+              name: {{ include "awx.fullname" . }}-application-config
+              subPath: SECRET_KEY
+              readOnly: true
           env:
             - name: DATABASE_USER
               value: {{ .Values.postgresql.postgresqlUsername }}
