@@ -37,8 +37,18 @@ spec:
               path: /
               port: http
           volumeMounts:
-            - mountPath: /etc/tower
-              name: {{ include "awx.fullname" . }}
+            - mountPath: /etc/tower/settings.py
+              name: {{ include "awx.fullname" . }}-application-config
+              subPath: settings.py
+              readOnly: true
+            - mountPath: /etc/nginx/nginx.conf
+              name: {{ include "awx.fullname" . }}-nginx-config
+              subPath: nginx.conf
+              readOnly: true
+            - mountPath: /etc/tower/SECRET_KEY
+              name: {{ include "awx.fullname" . }}-application-config
+              subPath: SECRET_KEY
+              readOnly: true
           env:
             - name: DATABASE_USER
               value: {{ .Values.postgresql.postgresqlUsername }}
@@ -90,11 +100,17 @@ spec:
 {{ toYaml .Values.nodeSelector | indent 8 }}
     {{- end }}
       volumes:
-        - name: {{ include "awx.fullname" . }}
+      - name: {{ include "awx.fullname" . }}-application-config
           configMap:
             name: {{ include "awx.fullname" . }}
             items:
-              - key: settings.py
-                path: settings.py
-              - key: secret_key
-                path: SECRET_KEY
+            - key: settings.py
+              path: settings.py
+            - key: secret_key
+              path: SECRET_KEY
+      - name: {{ include "awx.fullname" . }}-nginx-config
+          configMap:
+            name: {{ include "awx.fullname" . }}
+            items:
+            - key: nginx.conf
+              path: nginx.conf
